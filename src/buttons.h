@@ -61,19 +61,19 @@ public:
       return time >= 1000 and not long_press ? (long_press = true) : false;
    }
 
-   bool click()
-   {
-      if (inverted) {
-         if (not pin) 
-            tick_subscribe();
-      } else {
-         if (pin)
-            tick_subscribe();
-      }
-      if (time > 10 and time < 1000)
-         click_ = true;
-      return not pin and click_ ? (not (click_ = false)) : false;
-   }
+   // bool click()
+   // {
+   //    if (inverted) {
+   //       if (not pin) 
+   //          tick_subscribe();
+   //    } else {
+   //       if (pin)
+   //          tick_subscribe();
+   //    }
+   //    if (time > 10 and time < 1000)
+   //       click_ = true;
+   //    return not pin and click_ ? (not (click_ = false)) : false;
+   // }
 
    operator int()
    {
@@ -159,7 +159,7 @@ public:
             two.tick_subscribe(); 
          }
          bool result{false};
-         if (one.time > 10 and one.time < 1000 and one.time > 10 and two.time < 1000)
+         if (one.time > 10 and one.time < 100 and two.time > 10 and two.time < 100)
             one.click_ = two.click_ = true;
          result = not one.is_set() and not two.is_set() and (one.click_ or two.click_);
          if (result)

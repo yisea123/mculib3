@@ -159,9 +159,9 @@ public:
             two.tick_subscribe(); 
          }
          bool result{false};
-         if (one.time > 10 and one.time < 100 and two.time > 10 and two.time < 100)
+         if (one.time > 100 and one.time < 200 and two.time > 100 and two.time < 200)
             one.click_ = two.click_ = true;
-         result = not one.is_set() and not two.is_set() and (one.click_ or two.click_);
+         result = not one.is_set() and not two.is_set() and (one.click_ or two.click_) and not  one.long_press and not two.long_press;
          if (result)
             one.click_ = two.click_ = false;
          return result;

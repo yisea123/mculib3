@@ -173,7 +173,7 @@ Flash_updater_impl<Data,sector...>::Flash_updater_impl()
     );
     static_assert (
         sizeof...(sector) > 1,
-        "Необходимо указать не менее двух секторов для записи"
+        "\033[7;33mНеобходимо указать не менее двух секторов для записи\033[0m"
     );
 }
 

@@ -171,6 +171,10 @@ Flash_updater_impl<Data,sector...>::Flash_updater_impl()
         std::is_trivially_copyable_v<Data>,
         "Можно сохранять только тривиально копируемую структуру"
     );
+    static_assert (
+        sizeof...(sector) == 2,
+        "Необходимо указать два сектора"
+    );
 }
 
 

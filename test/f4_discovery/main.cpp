@@ -7,13 +7,23 @@
 #include "pin.h"
 #include "timers.h"
 #include "literals.h"
-#include "adc.h"
+// #include "adc.h"
 #include "delay.h"
-#include "pwm_.h"
-#include "button_old.h"
-#include "encoder.h"
+// #include "pwm_.h"
+// #include "button_old.h"
+// #include "encoder.h"
 // #include "buttons.h"
 // #include "spi.h"
+#include "hd44780.h"
+#include "string_buffer.h"
+
+using E   = mcu::PC14;       
+using RW  = mcu::PC15;       
+using RS  = mcu::PC13;      
+using DB4 = mcu::PC2;       
+using DB5 = mcu::PC3;
+using DB6 = mcu::PC0;    
+using DB7 = mcu::PC1;
 
 
 /// эта функция вызываеться первой в startup файле
@@ -39,20 +49,22 @@ extern "C" void init_clock ()
 }
 
 
+
+
 int main()
 {
-   decltype(auto) encoder = Encoder::make<mcu::Periph::TIM8, mcu::PC6, mcu::PC7, true>();
-   decltype(auto) pwm = PWM::make<mcu::Periph::TIM3, mcu::PC9>(490);
+   // decltype(auto) encoder = Encoder::make<mcu::Periph::TIM8, mcu::PC6, mcu::PC7, true>();
+   // decltype(auto) pwm = PWM::make<mcu::Periph::TIM3, mcu::PC9>(490);
    // pwm.out_enable(); 
-   pwm.duty_cycle = 400;
+   // pwm.duty_cycle = 400;
    // volatile decltype (auto) led_blue   = Pin::make<mcu::PD15, mcu::PinMode::Output>();
    // volatile decltype (auto) led_orange = Pin::make<mcu::PD13, mcu::PinMode::Output>();
-   volatile decltype (auto) enter      = mcu::Button::make<mcu::PA8>(); 
-   volatile decltype (auto) led_red    = Pin::make<mcu::PA15, mcu::PinMode::Output>();
-   volatile decltype (auto) led_green  = Pin::make<mcu::PC10, mcu::PinMode::Output>();
+   // volatile decltype (auto) enter      = mcu::Button::make<mcu::PA8>(); 
+   // volatile decltype (auto) led_red    = Pin::make<mcu::PA15, mcu::PinMode::Output>();
+   // volatile decltype (auto) led_green  = Pin::make<mcu::PC10, mcu::PinMode::Output>();
 
-   Timer timer{100};
-   int16_t value;
+   // Timer timer{100};
+   // int16_t value;
    
    // constexpr auto conversion_on_channel {16};
    // constexpr auto _2V {2 * 16 * 4095/3.3}; 
@@ -70,14 +82,20 @@ int main()
       //   led_blue = adc.voltage < _2V;
    //  });
    //  adc.control.start();
-   encoder = 18000;
+   // encoder = 18000;
+   constexpr auto hd44780_pins = HD44780_pins<RS, RW, E, DB4, DB5, DB6, DB7>{};
+   String_buffer lcd;
+    HD44780& hd44780 { HD44780::make(hd44780_pins, lcd.get_buffer()) };
+    lcd << "Hi, I'm V17. Do you wanna work?";
    while(1){
-      led_red = pwm ^= enter; 
-      pwm.frequency = encoder;
-      value = encoder;
-      // led_green ^= timer.event();
-      // led_red   ^= enter;
-      led_green = value > 200 ? true : false;
+
+      
+      // led_red = pwm ^= enter; 
+      // pwm.frequency = encoder;
+      // value = encoder;
+      // // led_green ^= timer.event();
+      // // led_red   ^= enter;
+      // led_green = value > 200 ? true : false;
       // pwm.duty_cycle += timer.event() ? step_pwm : 0;
       // step_pwm = (pwm.duty_cycle >= 990 or pwm.duty_cycle <= 10) ? -step_pwm : step_pwm;
       // value = pwm.duty_cycle;

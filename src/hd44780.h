@@ -35,7 +35,7 @@ public:
     template <class HD44780_pins>
     static HD44780& make(HD44780_pins pins, const std::array<char, 80>& buffer);
 
-
+    bool init_done()  {return init_;}
 
 private:
     using BSRR = std::pair<uint32_t, uint32_t>;
@@ -50,6 +50,7 @@ private:
     const std::array<BSRR, 256>& chars;
     const std::array<BSRR, 256>& command;
     uint32_t second;
+    bool init_ {false};
 
     class Symbol_n {
     public:
@@ -178,7 +179,7 @@ HD44780& HD44780::make(HD44780_pins pins, const std::array<char, 80>& buffer)
     >();
 
     screen.init();
-    screen.tick_subscribe<Faster::x10>();
+    screen.tick_subscribe<Faster::x2>();
 
     return screen;
 }
@@ -198,9 +199,9 @@ void HD44780::init()
     
     auto strob_e = [&](){
         e = false;
-        while(delay.us(100)) {}
+        while(delay.us(200)) {}
         e = true;
-        while(delay.us(100)) {}
+        while(delay.us(200)) {}
     };
 
     auto instruction = [&](uint32_t action) {
@@ -209,10 +210,10 @@ void HD44780::init()
         strob_e();
         port.atomic_write(command[action].second);
         strob_e();
-        while(delay.us(50)) {}
+        while(delay.us(100)) {}
     };
     
-    while(delay.ms(20)) {}
+    while(delay.ms(100)) {}
     rs = false;
     rw = false;
     e = true;
@@ -234,6 +235,7 @@ void HD44780::init()
     instruction (display_clear);
     instruction (set_to_zero);
     while(delay.ms(1)) {}
+    init_ = true;
 }
 
 void HD44780::notify()

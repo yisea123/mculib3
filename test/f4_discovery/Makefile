@@ -1,6 +1,6 @@
 TARGET_F4 = main
 DEBUG = 1
-OPT = -O0
+OPT = -Os
 CPPSTD =-std=c++17
 BUILD_DIR = build
 
@@ -52,7 +52,7 @@ MCU_F4 = $(CPU_F4) -mthumb $(FPU_F4) $(FLOAT-ABI_F4)
 ASFLAGS_F4 = $(MCU_F4) $(OPT) -Wall -fdata-sections -ffunction-sections 
 
 CFLAGS_F4  = $(MCU_F4) $(C_DEFS_F4) $(C_INCLUDES) $(C_INCLUDES_F4) $(OPT)
-CFLAGS_F4 += -Wall -Wno-register -Wno-strict-aliasing -fdata-sections -ffunction-sections -fno-exceptions -fno-strict-volatile-bitfields -fno-threadsafe-statics -Wno-packed-bitfield-compat
+CFLAGS_F4 += -Wall -Wno-register -Wno-strict-aliasing -fdata-sections -ffunction-sections -fno-exceptions -fno-strict-volatile-bitfields -fno-threadsafe-statics -Wno-packed-bitfield-compat -Wnon-template-friend -fexec-charset=cp1251
 CFLAGS_F4 += -g -gdwarf-2 
 
 

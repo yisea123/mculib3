@@ -83,10 +83,21 @@ int main()
    //  });
    //  adc.control.start();
    // encoder = 18000;
+
+   
+
+   uint16_t frequency = 22000;
+   uint16_t current = 0.5;
    constexpr auto hd44780_pins = HD44780_pins<RS, RW, E, DB4, DB5, DB6, DB7>{};
    String_buffer lcd;
-    HD44780& hd44780 { HD44780::make(hd44780_pins, lcd.get_buffer()) };
-    lcd << "Hi, I'm V17. Do you wanna work?";
+   HD44780 hd44780 { HD44780::make(hd44780_pins, lcd.get_buffer()) };
+   // lcd.line(0).cursor(2) << "Hi, I'm V17.";
+   // lcd.line(1) << "You wanna work?";
+
+   lcd.line(0) << "F = " << frequency;
+   lcd.line(1) << "I = " << current;
+
+   
    while(1){
 
       

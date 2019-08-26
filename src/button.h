@@ -5,7 +5,7 @@
 #include "function.h"
 #include "pin.h"
 #include "interrupt.h"
-#include "periph_exti.h"
+// #include "periph_exti.h"
 #include "periph_rcc.h"
 
 

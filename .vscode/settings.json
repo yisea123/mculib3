@@ -49,6 +49,15 @@
       "algorithm": "cpp",
       "bitset": "cpp",
       "cstdarg": "cpp",
-      "iomanip": "cpp"
+      "iomanip": "cpp",
+      "unordered_set": "cpp",
+      "iterator": "cpp",
+      "map": "cpp",
+      "memory_resource": "cpp",
+      "numeric": "cpp",
+      "random": "cpp",
+      "set": "cpp",
+      "string": "cpp",
+      "cfenv": "cpp"
    }
 }

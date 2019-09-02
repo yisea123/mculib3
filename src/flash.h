@@ -203,6 +203,10 @@ bool Flash_updater_impl<Data,sector...>::is_read()
         return std::all_of (std::begin(byte_readed), std::end(byte_readed), [](auto& v){return v;});
     };
     flash.unlock();
+    #if defined(STM32F4) or defined(STM32F7)
+        flash.set (FLASH_::ProgSize::x16)
+             .en_interrupt_endOfProg(); // без этого не работает
+    #endif
     for (size_t i{0}; i < memory.size(); i++) {
         memory_offset = std::find_if(memory[i].begin(), memory[i].end()
             , [&](auto& word) bool {

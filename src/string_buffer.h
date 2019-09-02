@@ -27,6 +27,7 @@ public:
     String_buffer& operator<< (int number);
     String_buffer& operator<< (char);
     String_buffer& operator<< (String_buffer_ref& function);
+    String_buffer& div_1000 (int number);
     String_buffer& line   (size_t string);
     String_buffer& width  (size_t width );
     String_buffer& cursor (size_t cursor);
@@ -126,6 +127,17 @@ String_buffer& String_buffer::operator<< (int number)
     }
     *this << string;
     width_size = 0;
+    return *this;
+}
+
+String_buffer& String_buffer::div_1000 (int number)
+{
+    *this << (number / 1000);
+    *this << '.';
+    int _ = number % 1000;
+    _ /= 10;
+    if (_ < 10)  *this << 0  << _;
+    else         *this << _;
     return *this;
 }
 

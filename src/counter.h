@@ -82,5 +82,5 @@ public:
    }
 
    operator uint16_t(){return value;}
-   void reset() {value = 0;}
+   void set_value(uint16_t v) {value = v; tim.clear_counter();}
 };

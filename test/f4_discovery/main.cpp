@@ -7,7 +7,8 @@
 #include "pin.h"
 #include "timers.h"
 #include "literals.h"
-// #include "adc.h"
+#include "adc.h"
+#include "NTC_table.h"
 #include "delay.h"
 // #include "pwm_.h"
 // #include "button_old.h"
@@ -48,11 +49,14 @@ extern "C" void init_clock ()
       .wait_PLL_ready();
 }
 
-
-
-
 int main()
 {
+   constexpr auto conversion_on_channel {16};
+   struct {
+      ADC_average& control     = ADC_average::make<mcu::Periph::ADC1>(conversion_on_channel);
+      ADC_channel& temperature = control.add_channel<mcu::PA2>();
+   } adc{};
+   
    // decltype(auto) encoder = Encoder::make<mcu::Periph::TIM8, mcu::PC6, mcu::PC7, true>();
    // decltype(auto) pwm = PWM::make<mcu::Periph::TIM3, mcu::PC9>(490);
    // pwm.out_enable(); 
@@ -60,47 +64,56 @@ int main()
    // volatile decltype (auto) led_blue   = Pin::make<mcu::PD15, mcu::PinMode::Output>();
    // volatile decltype (auto) led_orange = Pin::make<mcu::PD13, mcu::PinMode::Output>();
    // volatile decltype (auto) enter      = mcu::Button::make<mcu::PA8>(); 
-   // volatile decltype (auto) led_red    = Pin::make<mcu::PA15, mcu::PinMode::Output>();
+   volatile decltype (auto) led_red    = Pin::make<mcu::PA15, mcu::PinMode::Output>();
    // volatile decltype (auto) led_green  = Pin::make<mcu::PC10, mcu::PinMode::Output>();
 
    // Timer timer{100};
    // int16_t value;
    
-   // constexpr auto conversion_on_channel {16};
+   
    // constexpr auto _2V {2 * 16 * 4095/3.3}; 
    // auto step_pwm {10};
-   //  struct {
-   //      ADC_average& control     = ADC_average::make<mcu::Periph::ADC1>(conversion_on_channel);
-   //      ADC_channel& voltage     = control.add_channel<mcu::PA2>();
-   //  } adc{};
 
-   // decltype(auto) pwm = PWM::make<mcu::Periph::TIM4, mcu::PD15>(999);
-   // pwm.out_enable();
-
-   //  adc.control.set_callback ([&]{
-      //   pwm.duty_cycle = adc.voltage / 60;
-      //   led_blue = adc.voltage < _2V;
-   //  });
-   //  adc.control.start();
-   // encoder = 18000;
+   constexpr size_t U = 33;
+   constexpr size_t R = 5100;
+   volatile auto t  = NTC::u2904<U,R>[30];
+   // volatile auto t2 = NTC::u2904<U,R>[26];
 
    
 
-   uint16_t frequency = 22000;
-   uint16_t current = 0.5;
+   int temp{0};
+
+   
+
+   adc.control.set_callback ([&]{
+      adc.temperature = adc.temperature / 16;
+      for (size_t i = 0; i <= std::size(NTC::u2904<U,R>) - 2; i++) {
+         if (adc.temperature < NTC::u2904<U,R>[i] and adc.temperature > NTC::u2904<U,R>[i + 1])
+            temp = i;
+      }
+
+      // led_red = adc.temperature < t;
+   });
+    adc.control.start();
+
+   
+
+   // uint16_t frequency = 22000;
+   // uint16_t current = 0.5;
    constexpr auto hd44780_pins = HD44780_pins<RS, RW, E, DB4, DB5, DB6, DB7>{};
    String_buffer lcd;
    HD44780 hd44780 { HD44780::make(hd44780_pins, lcd.get_buffer()) };
    // lcd.line(0).cursor(2) << "Hi, I'm V17.";
    // lcd.line(1) << "You wanna work?";
 
-   lcd.line(0) << "F = " << frequency;
-   lcd.line(1) << "I = " << current;
+   lcd.line(0) << "t = " << temp;
+   // lcd.line(1) << "I = " << current;
 
    
    while(1){
 
-      
+      lcd.line(0) << "t = " << temp;
+      led_red = temp >= 30;
       // led_red = pwm ^= enter; 
       // pwm.frequency = encoder;
       // value = encoder;

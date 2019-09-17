@@ -53,10 +53,15 @@ int main()
 {
    constexpr auto conversion_on_channel {16};
    struct {
-      ADC_average& control     = ADC_average::make<mcu::Periph::ADC1>(conversion_on_channel);
-      ADC_channel& temperature = control.add_channel<mcu::PA2>();
+      ADC_average& control       = ADC_average::make<mcu::Periph::ADC1>(conversion_on_channel);
+      ADC_channel& temperature   = control.add_channel<mcu::PA2>();
    } adc{};
    
+
+   struct {
+      ADC_average& control       = ADC_average::make<mcu::Periph::ADC2>(conversion_on_channel);
+      ADC_channel& temperature_2 = control.add_channel<mcu::PA1>();
+   } adc2{};
    // decltype(auto) encoder = Encoder::make<mcu::Periph::TIM8, mcu::PC6, mcu::PC7, true>();
    // decltype(auto) pwm = PWM::make<mcu::Periph::TIM3, mcu::PC9>(490);
    // pwm.out_enable(); 
@@ -82,19 +87,28 @@ int main()
    
 
    int temp{0};
+   int temp_2{0};
+   
 
    
 
    adc.control.set_callback ([&]{
       adc.temperature = adc.temperature / 16;
+      adc2.temperature_2 = adc2.temperature_2 / 16;
       for (size_t i = 0; i <= std::size(NTC::u2904<U,R>) - 2; i++) {
          if (adc.temperature < NTC::u2904<U,R>[i] and adc.temperature > NTC::u2904<U,R>[i + 1])
             temp = i;
       }
 
+      for (size_t i = 0; i <= std::size(NTC::u2904<U,R>) - 2; i++) {
+         if (adc2.temperature_2 < NTC::u2904<U,R>[i] and adc2.temperature_2 > NTC::u2904<U,R>[i + 1])
+            temp_2 = i;
+      }
+      
       // led_red = adc.temperature < t;
    });
     adc.control.start();
+    adc2.control.start();
 
    
 
@@ -107,6 +121,7 @@ int main()
    // lcd.line(1) << "You wanna work?";
 
    lcd.line(0) << "t = " << temp;
+   // lcd.line(1) << cur;
    // lcd.line(1) << "I = " << current;
 
    
@@ -114,6 +129,8 @@ int main()
 
       lcd.line(0) << "t = " << temp;
       led_red = temp >= 30;
+      // cur = adc.current;
+      lcd.line(1) << temp_2;
       // led_red = pwm ^= enter; 
       // pwm.frequency = encoder;
       // value = encoder;

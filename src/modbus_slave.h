@@ -340,14 +340,14 @@ void Modbus_slave<InReg, OutRegs_t, coils_qty>::answer_05()
 
     enum {off = 0, on = 0x00FF};
 
-    if (value != off or value != on) {
+    if (value != 0 and value != 0xFF00) {
         answer_error(Modbus_error_code::wrong_value);
         return;
     }
 
     auto& callback = force_single_coil_05[first_reg];
     if (callback)
-        callback(value == on);
+        callback(value == 0xFF00);
 
     uart.buffer.set_size(8); // данные в ответе те же
     uart.transmit();

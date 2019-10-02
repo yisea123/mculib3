@@ -17,11 +17,12 @@ public:
         return state;
     }
 
-
+    void set_min(U v) {min = v;}
+    void set_max(U v) {max = v;}
 
 private:
     const T& current;
-    const U min;
-    const U max;
+    U min;
+    U max;
     bool state {false};
 };

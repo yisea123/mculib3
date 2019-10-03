@@ -227,7 +227,7 @@ inline void Modbus_slave<InRegs_t, OutRegs_t, coils_qty>::operator() (function r
     switch (Modbus_function(func)) {
         case Modbus_function::read_03 : answer_03();         break;
         case Modbus_function::write_16: answer_16(reaction); break;
-        // case Modbus_function::force_coil_05: answer_05();    break;
+        case Modbus_function::force_coil_05: answer_05();    break;
         default: answer_error (Modbus_error_code::wrong_func);
     }
 }
@@ -275,9 +275,9 @@ void Modbus_slave<InReg, OutRegs_t, coils_qty>::answer_error(Modbus_error_code c
     if (code == Modbus_error_code::wrong_func)
         uart.buffer << address << set_high_bit(func) << static_cast<uint8_t>(code);
     else if (code == Modbus_error_code::wrong_reg)
-        uart.buffer << address << func << static_cast<uint8_t>(code);
+        uart.buffer << address << set_high_bit(func) << static_cast<uint8_t>(code);
     else if (code == Modbus_error_code::wrong_value)
-        uart.buffer << address << func << static_cast<uint8_t>(code);
+        uart.buffer << address << set_high_bit(func) << static_cast<uint8_t>(code);
         
     auto [low_, high_] = CRC16(uart.buffer.begin(), uart.buffer.end());
     uart.buffer << low_ << high_;
@@ -338,16 +338,16 @@ void Modbus_slave<InReg, OutRegs_t, coils_qty>::answer_05()
     uint16_t value;
     uart.buffer >> value;
 
-    enum {off = 0, on = 0xFF00};
+    enum {off = 0, on = 0x00FF};
 
-    if (value != off or value != on) {
+    if (value != 0 and value != 0xFF00) {
         answer_error(Modbus_error_code::wrong_value);
         return;
     }
 
     auto& callback = force_single_coil_05[first_reg];
     if (callback)
-        callback(value == on);
+        callback(value == 0xFF00);
 
     uart.buffer.set_size(8); // данные в ответе те же
     uart.transmit();

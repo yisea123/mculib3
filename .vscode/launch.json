@@ -5,6 +5,30 @@
 "version": "0.2.0",
 "configurations": [
     {
+        "name": "openocd",
+        "request": "launch",
+        "type": "cortex-debug",
+        "cwd": "${workspaceRoot}",
+        "servertype": "openocd",
+        "executable": "${workspaceRoot}/test/f4_discovery/build/main.elf",
+        "svdFile": "STM32F429.svd",
+        "configFiles": [
+            "/usr/share/openocd/scripts/board/stm32f407discovery.cfg"
+        ]
+    },
+
+    {
+        "type": "cortex-debug",
+        "request": "launch",
+        "servertype": "stutil",
+        "cwd": "${workspaceRoot}",
+        "executable": "${workspaceRoot}/test/f4_discovery/build/main.elf",
+        "name": "Debug Microcontroller",
+        "svdFile": "${workspaceRoot}/STM32F4_files/svd/STM32F407.svd",
+            // "device": "STM32F429",
+            "v1": false
+    },
+    {
         "name": "test_on_pc",
         "type": "cppdbg",
         "request": "launch",
@@ -70,7 +94,7 @@
         "cwd": "${workspaceRoot}",
         "executable": "${workspaceRoot}/test/f4_discovery/build/main.elf",
         "name": "Debug (ST-Util)",
-        "svdFile": "${workspaceRoot}/STM32F4_files/svd/STM32F429.svd",
+        "svdFile": "/net/factory/users/aag/code/cmsis-svd/data/STMicro/STM32F405.svd",
         // "device": "STM32F429",
         "v1": false
     }

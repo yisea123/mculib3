@@ -205,15 +205,16 @@ template<bool on>
 constexpr const std::tuple<uint8_t,uint8_t> Register<address_,f,register_n_,T>::crc()
 {
     if constexpr (f == Modbus_function::read_03 or f == Modbus_function::force_coil_05) {
-        byte by = f == Modbus_function::force_coil_05 and on ? 0x55 :
-                  f == Modbus_function::read_03              ? 1 : 0;
+        byte by  = f == Modbus_function::force_coil_05 and on ? 0xFF : 0;
+        byte by_ = f == Modbus_function::read_03 ? 1 : 0;
+                  
         auto res = Static_vector<byte, 8> {
                 address_
             , byte(f)
             , static_cast<byte>(register_n_ << 8)
             , static_cast<byte>(register_n_)
-            , byte(0)
             , by
+            , by_
         };
         return CRC16(res.cbegin(), res.cend());
     } else {
@@ -250,11 +251,13 @@ void Modbus_master<max_regs_qty>::operator() ()
                 uart.buffer << static_cast<byte>(reg->function);
                 uart.buffer << static_cast<byte>(reg->register_n << 8);
                 uart.buffer << static_cast<byte>(reg->register_n);
-                uart.buffer << byte(0);
+                
                 if (reg->function == Modbus_function::read_03 or reg->function == Modbus_function::write_16) {
+                    uart.buffer << byte(0);
                     uart.buffer << byte(1);
                 } else if (reg->function == Modbus_function::force_coil_05) {
-                    uart.buffer << (bool(reg->data) ? byte(0x55) : byte(0));
+                    uart.buffer << (bool(reg->data) ? byte(0xFF) : byte(0));
+                    uart.buffer << byte(0);
                 }
                 if (reg->function == Modbus_function::write_16) {
                     uart.buffer << static_cast<byte>(reg->data << 8) << static_cast<byte>(reg->data);

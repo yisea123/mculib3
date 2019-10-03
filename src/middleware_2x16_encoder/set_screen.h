@@ -21,6 +21,7 @@ public:
           String_buffer&   lcd
         , Buttons_events   eventers
         , std::string_view name
+        , std::string_view unit
         , T& var
         , Min<T> min
         , Max<T> max
@@ -33,6 +34,7 @@ public:
       , out_callback   {out_callback.value}
       , enter_callback {enter_callback.value}
       , name           {name}
+      , unit           {unit}
       , var            {var}
       , tmp            {var}
       
@@ -55,11 +57,10 @@ public:
         lcd.line(0) << name << next_line;
         tmp = var;
         if (to_string != null_to_string)
-            lcd.line(1) << to_string(tmp) << next_line;
-        else 
-            lcd << tmp << next_line;
-        lcd << "Нажатие   " << '~' << "Сохран." << next_line;
-        lcd << "Удержание " << '~' << "Отмена"  << next_line;
+            lcd.line(1) << to_string(tmp) << unit << next_line;
+        else {
+            lcd << tmp << unit << next_line;
+        }
     }
 
     void deinit() override {
@@ -83,6 +84,7 @@ private:
     Callback<>     out_callback;
     Callback<>     enter_callback;
     const std::string_view name;
+    const std::string_view unit;
     T& var;
     T tmp;
 
@@ -92,10 +94,10 @@ private:
         if (tmp < min or tmp == std::numeric_limits<T>::max())
             tmp = max;
         if (to_string != null_to_string) {
-            lcd.line(1) << to_string(tmp) << next_line;
+            lcd.line(1) << to_string(tmp) << unit << next_line;
             return;
         }
-        lcd.line(1) << tmp << next_line;
+        lcd.line(1) << tmp << unit << next_line;
     }
 
     void up (int increment = 1)
@@ -104,10 +106,10 @@ private:
         if (tmp > max)
             tmp = min;
         if (to_string != null_to_string) {
-            lcd.line(1) << to_string(tmp) << next_line;
+            lcd.line(1) << to_string(tmp) << unit << next_line;
             return;
         }
-        lcd.line(1) << tmp << next_line;
+        lcd.line(1) << tmp << unit << next_line;
     }
 };
 
@@ -117,6 +119,7 @@ Set_screen (
         String_buffer&   lcd
     , Buttons_events   eventers
     , std::string_view name
+    , std::string_view unit
     , T& var
     , Min<T> min
     , Max<T> max
